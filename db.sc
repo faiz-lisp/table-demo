@@ -1,9 +1,17 @@
-(define (version) "V1.06b")
+
+;init
+
+(load "g:/my/libs/chez/lib.sc") ;;ver 1.83
+;case os: c:/; or /c/;
+
+(define (version) "V1.06d")
 
 #|
 ## desc ;;
   - **This is a table demo on Windows with my [Chez-Lib](https://github.com/faiz-lisp/libs.git)**.
+  - Current subject: key and word
   - types
+    - '([key value] )
     - '([(key) value flag])
     - '([(id) desc flag]  )
     - '([id task status](0 "nil" ok) )
@@ -28,9 +36,6 @@
 ;pre
 ;(import (chezscheme))
 
-;init
-(load "g:/my/libs/chez/lib.sc") ;;ver 1.83
-;case os: c:/; or /c/;
 
 ;alias
 (ali reset-rand reset-randseed)
@@ -66,10 +71,10 @@
 
 ;;
 
-(setq *types* '(id desc flg)) ;init?
+(setq *types* '(key value)) ;init?
 (setq *defa-type-id* 1) ;1-based, the key is
 (setq *defa-tab-file* "db.dat")
-(setq *db* nil  *db0* `[,*types* (0 "nil" ok)])
+(setq *db* nil  *db0* `[,*types* (ret "return")])
 ; [id short desc date-time]
 
 ;
@@ -141,7 +146,7 @@ TODO:
   (case-lam
     ([x flg xz]
       (letn (
-          [ops (lam(x) (remov #\-[remov #\space (str->list[string-downcase(str x)])]))] ;#\-
+          [ops (lam(x) (remov #\-[remov #\space (str->list[string-downcase(str x)])]))] ;;
           [y (ops x)] ;
           [i (if [num? flg] flg (nth-of flg *types*))] )
         (def (_ xz)
@@ -155,9 +160,9 @@ TODO:
     ) )
     ([x i] (search-all x i *db*))
     ([x]  
-      (case (ty x) ;;?
-        ["string" (search-all x 3)]
-        ["symbol" (search-all x 2)]
+      (case (ty x) ;;
+        ["string" (search-all x 2)]
+        ["symbol" (search-all x 1)]
         [else nil]
     ) )
 ) )
@@ -185,8 +190,8 @@ TODO:
     [(x)
       (get x
         (case (ty x) ;;
-          ("number" 1)
-          ("symbol" 2)
+          ("string" 2)
+          ("symbol" 1)
           (else 3)
     ) ) ] ;
 ) )
@@ -218,6 +223,10 @@ TODO:
 (def/va (chk-db [db *db*]) ;need to be synt
   (echol `(len  *db*) '= (len db))
   (echol `(last *db*) '= (last db)) ;echo ng
+)
+
+(def/va (db-show [db *db*])
+  db
 )
 
 ;(fix [xs] '(short name) '(17 poi "POIjk") [*defa-type-id*]) ;whole-new/Fal/nil?
@@ -258,7 +267,7 @@ TODO:
 
 ;how ab backup?
 ;save&
-(defn/values save-db (file) [*defa-tab-file*] ;?
+(defn/values save-tab->file (file) [*defa-tab-file*] ;?
 
   (sys [str `("@del/s/q " ,file ".bak 1>nul 2>nul")]) ;how ab linefeed for multi-line
   (sys [str `("@ren " ,file " " ,file ".bak 2>nul")])
